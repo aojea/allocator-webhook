@@ -26,6 +26,7 @@ import (
 	"github.com/aojea/clusterip-webhook/pkg/allocator"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
@@ -63,6 +64,7 @@ func (a *ClusterIPAllocator) Handle(ctx context.Context, req admission.Request) 
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
+	klog.Infof("Handle service %v", svc)
 	// clusterIP is set, validate and allocate it in the API IPRange object
 	if len(svc.Spec.ClusterIP) > 0 && svc.Spec.ClusterIP != corev1.ClusterIPNone {
 		ip := net.ParseIP(svc.Spec.ClusterIP)
@@ -73,6 +75,7 @@ func (a *ClusterIPAllocator) Handle(ctx context.Context, req admission.Request) 
 		if err != nil {
 			return admission.Errored(http.StatusInternalServerError, err)
 		}
+		klog.Infof("IP allocated %s", svc.Spec.ClusterIP)
 		return admission.Allowed("")
 	}
 	// ClusterIP is empty, we need to allocate one
@@ -81,6 +84,7 @@ func (a *ClusterIPAllocator) Handle(ctx context.Context, req admission.Request) 
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 	svc.Spec.ClusterIP = alloc.String()
+	klog.Infof("IP allocated %s", svc.Spec.ClusterIP)
 	marshaledSvc, err := json.Marshal(svc)
 	if err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)
