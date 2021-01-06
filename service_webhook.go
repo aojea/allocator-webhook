@@ -67,7 +67,7 @@ func (a *ClusterIPAllocator) Handle(ctx context.Context, req admission.Request) 
 	if len(svc.Spec.ClusterIP) > 0 && svc.Spec.ClusterIP != corev1.ClusterIPNone {
 		ip := net.ParseIP(svc.Spec.ClusterIP)
 		if ip == nil {
-			return admission.Errored(http.StatusInternalServerError, fmt.Errorf("invalid IP address %s", ip))
+			return admission.Errored(http.StatusInternalServerError, fmt.Errorf("invalid IP address %s", svc.Spec.ClusterIP))
 		}
 		err = a.allocator.Allocate(ip)
 		if err != nil {
