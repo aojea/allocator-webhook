@@ -43,7 +43,7 @@ func init() {
 func main() {
 	entryLog := log.Log.WithName("entrypoint")
 	var serviceSubnet string
-	flag.StringVar(&serviceSubnet, "service-subnet", "10.96.0.0/16", "The service subnet.")
+	flag.StringVar(&serviceSubnet, "service-subnet", "10.96.0.0/12", "The service subnet.")
 
 	// Setup a Manager
 	entryLog.Info("setting up manager")
